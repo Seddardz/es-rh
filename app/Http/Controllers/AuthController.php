@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Hash;
+use Str;
 use App\Models\User;
 class AuthController extends Controller
 {
@@ -23,12 +24,19 @@ class AuthController extends Controller
 
         public function register_post(Request $request)
     {
+        $user =request()->validate([
+        'name'=>'required',
+        'email'=>'required|unique:users',
+        'password'=>'required|min:6',
+        'confirm_password'=>'required_with:password|same:password|min:6',
+        ]);
         $user = new User;
         $user->name = trim($request->name);
         $user->email = trim($request->email);
         $user->password = Hash::make($request->password);
+        $user->remember_token=Str::random(50);
         $user->save();
-        return redirect('/')->with('success','Register Successfully');
+        return redirect('/')->with('success','Register Successfully.');
     }
 }
 
